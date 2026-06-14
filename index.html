@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ember & Salt — Wood-Fired Coastal Kitchen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          charcoal: '#1c1815',
+          charcoal2: '#241f1b',
+          bone: '#f4ede2',
+          bonedim: '#e6dccb',
+          ember: '#d2693c',
+          embersoft: '#e7956b',
+          olive: '#6e7048',
+          gold: '#c9a56b',
+          rust: '#7a3326',
+        },
+        fontFamily: {
+          display: ['Fraunces', 'serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['IBM Plex Mono', 'monospace'],
+        },
+      }
+    }
+  }
+</script>
+<style>
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+  }
+
+  .dotted-line{
+    border-bottom:1px dotted rgba(244,237,226,0.25);
+    height:1px;
+    transform:translateY(-5px);
+  }
+
+  /* Embers */
+  .ember-particle{
+    position:absolute;
+    bottom:-20px;
+    border-radius:50%;
+    background:#e7956b;
+    box-shadow:0 0 8px 2px rgba(210,105,60,0.7);
+    animation:rise linear infinite;
+    opacity:0;
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0); opacity:0;}
+    10%{opacity:0.9;}
+    80%{opacity:0.5;}
+    100%{transform:translateY(-105vh) translateX(40px); opacity:0;}
+  }
+
+  /* Fade up entrance */
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(24px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .fade-up{opacity:0; animation:fadeUp 1s ease forwards;}
+
+  /* Scroll cue */
+  @keyframes slideDown{
+    0%{transform:translateY(-20px);}
+    100%{transform:translateY(54px);}
+  }
+  .scroll-line::after{
+    content:''; position:absolute; top:0; left:0; width:100%; height:14px;
+    background:#d2693c;
+    animation:slideDown 2.4s ease-in-out infinite;
+  }
+
+  /* Nav underline */
+  .nav-link{position:relative; padding-bottom:6px;}
+  .nav-link::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:#d2693c; transition:width .3s ease;
+  }
+  .nav-link:hover::after{width:100%;}
+
+  /* Select arrow */
+  select{
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a56b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 4px center;
+  }
+  select option{background:#1c1815; color:#f4ede2;}
+</style>    
+</head>
+<body class="bg-charcoal text-bone font-body overflow-x-hidden">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[200] bg-ember text-charcoal px-4 py-2 font-mono text-sm">Skip to content</a>
+
+<!-- HEADER -->
+<header id="site-header" class="fixed top-0 left-0 right-0 z-[100] py-6 transition-all duration-300">
+  <div class="max-w-[1180px] mx-auto px-8">
+    <nav class="flex items-center justify-between">
+      <a href="#top" class="font-display text-xl md:text-2xl font-semibold tracking-wide">Ember <span class="text-embersoft">&amp;</span> Salt</a>
+
+      <ul class="hidden md:flex gap-10 list-none">
+        <li><a href="#menu" class="nav-link font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone transition-colors">Menu</a></li>
+        <li><a href="#about" class="nav-link font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone transition-colors">About</a></li>
+        <li><a href="#gallery" class="nav-link font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone transition-colors">Gallery</a></li>
+        <li><a href="#reservations" class="nav-link font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone transition-colors">Reservations</a></li>
+        <li><a href="#contact" class="nav-link font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone transition-colors">Contact</a></li>
+      </ul>
+
+      <a href="#reservations" class="hidden md:inline-block font-mono text-xs tracking-[0.18em] uppercase border border-gold text-gold px-5 py-2.5 hover:bg-gold hover:text-charcoal transition-colors">Reserve a Table</a>
+
+      <button id="navToggle" aria-label="Toggle menu" class="md:hidden text-bone text-2xl bg-transparent border-none cursor-pointer">&#9776;</button>
+    </nav>
+
+    <!-- mobile menu -->
+    <ul id="mobileMenu" class="hidden md:hidden flex-col gap-4 mt-4 bg-charcoal/95 border border-white/10 p-6 absolute right-8 left-8 list-none">
+      <li><a href="#menu" class="font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone">Menu</a></li>
+      <li><a href="#about" class="font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone">About</a></li>
+      <li><a href="#gallery" class="font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone">Gallery</a></li>
+      <li><a href="#reservations" class="font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone">Reservations</a></li>
+      <li><a href="#contact" class="font-mono text-xs tracking-[0.18em] uppercase text-bonedim hover:text-bone">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section id="top" class="relative min-h-screen flex flex-col justify-center pt-32 overflow-hidden"
+    style="background: radial-gradient(ellipse at 20% 110%, rgba(210,105,60,0.30), transparent 60%), radial-gradient(ellipse at 85% -10%, rgba(110,112,72,0.25), transparent 55%), #1c1815;">
+
+    <div id="embers" class="absolute inset-0 pointer-events-none z-[1]" aria-hidden="true"></div>
+
+    <div class="relative z-[2] max-w-[1180px] mx-auto px-8 w-full">
+      <div class="fade-up font-mono text-[13px] tracking-[0.32em] uppercase text-embersoft mb-7" style="animation-delay:.15s">Wood-fired &mdash; Coastal &mdash; Unhurried</div>
+
+      <h1 class="fade-up font-display font-semibold leading-[0.98] text-[56px] md:text-[96px] lg:text-[132px]" style="animation-delay:.3s">
+        Cooked over<br><em class="italic font-light text-embersoft">open</em> flame.
+      </h1>
+
+      <p class="fade-up max-w-[480px] mt-7 text-lg text-bonedim font-light" style="animation-delay:.5s">
+        Ember &amp; Salt is a coastal kitchen built around a single live-fire hearth — where the menu changes with the tide, the season, and the smoke.
+      </p>
+
+      <div class="fade-up flex gap-12 mt-16 flex-wrap" style="animation-delay:.7s">
+        <div class="font-mono text-xs tracking-[0.12em] uppercase text-bonedim">Service<strong class="block font-display text-xl text-bone normal-case tracking-normal mt-1.5 font-medium not-italic">Dinner Nightly</strong></div>
+        <div class="font-mono text-xs tracking-[0.12em] uppercase text-bonedim">Location<strong class="block font-display text-xl text-bone normal-case tracking-normal mt-1.5 font-medium not-italic">Clifton Shoreline</strong></div>
+        <div class="font-mono text-xs tracking-[0.12em] uppercase text-bonedim">Seating<strong class="block font-display text-xl text-bone normal-case tracking-normal mt-1.5 font-medium not-italic">By Reservation</strong></div>
+      </div>
+    </div>
+
+    <div class="absolute bottom-10 left-8 flex items-center gap-3.5 font-mono text-[11px] tracking-[0.22em] uppercase text-bonedim z-[2]">
+      <span class="relative w-px h-10 bg-white/10 overflow-hidden scroll-line"></span> Scroll
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu" class="py-24 md:py-36 border-t border-white/10">
+    <div class="max-w-[1180px] mx-auto px-8">
+
+      <div class="flex justify-between items-end flex-wrap gap-6 mb-16">
+        <div>
+          <div class="flex items-center gap-3.5 font-mono text-xs tracking-[0.28em] uppercase text-embersoft mb-4">
+            <span class="w-7 h-px bg-ember inline-block"></span>The Menu
+          </div>
+          <h2 class="font-display font-semibold text-4xl md:text-6xl">From the hearth.</h2>
+        </div>
+        <p class="max-w-[360px] text-bonedim font-light">Everything passes through the fire — the wood changes weekly with what's been cut, dried, and seasoned in our yard.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-x-20 gap-y-16">
+
+        <!-- Fire -->
+        <div>
+          <h3 class="text-2xl italic text-embersoft font-medium mb-7 pb-3.5 border-b border-white/10">Fire</h3>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/hispi-cabbage/120/120" alt="Whole roasted hispi cabbage" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Whole Roasted Hispi Cabbage</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,450</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Charred leaves, brown butter, hazelnut dukkah, smoked yoghurt.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/lamb-shoulder/120/120" alt="Embered lamb shoulder" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Embered Lamb Shoulder</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 4,200</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Slow-cooked eight hours, sumac, pickled red onion, flatbread.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/beef-short-rib/120/120" alt="Charcoal beef short rib" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Charcoal Beef Short Rib</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 5,600</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Bone marrow jus, charred shallot, watercress.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/smoked-aubergine/120/120" alt="Smoked aubergine" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Smoked Aubergine</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,250</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Tahini, pomegranate molasses, mint, toasted seeds.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sea -->
+        <div>
+          <h3 class="text-2xl italic text-embersoft font-medium mb-7 pb-3.5 border-b border-white/10">Sea</h3>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/sea-bream/120/120" alt="Grilled whole sea bream" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Grilled Whole Sea Bream</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 4,800</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Salsa verde, charred lemon, fennel.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://images.unsplash.com/photo-1559742811-824289511f48?auto=format&fit=crop&w=150&h=150&q=80" alt="Hearth-roasted prawns" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Hearth-Roasted Prawns</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 3,950</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Garlic butter, chilli oil, sourdough for the juices.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/smoked-octopus/120/120" alt="Smoked octopus" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Smoked Octopus</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 4,100</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">White bean purée, paprika oil, crisp capers.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/charred-calamari/120/120" alt="Charred calamari" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Charred Calamari</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 2,600</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Lemon, chilli, parsley, smoked sea salt.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Garden -->
+        <div>
+          <h3 class="text-2xl italic text-embersoft font-medium mb-7 pb-3.5 border-b border-white/10">Garden</h3>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/tomato-burrata/120/120" alt="Heirloom tomato and burrata" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Heirloom Tomato &amp; Burrata</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,950</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Basil oil, aged balsamic, sourdough crumb.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/roasted-beetroot/120/120" alt="Roasted beetroot" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Roasted Beetroot</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,350</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Whipped goat's curd, walnut, honey, thyme.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/charred-greens/120/120" alt="Charred greens" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Charred Greens</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,100</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Anchovy butter, chilli flake, lemon zest.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sweet & Bar -->
+        <div>
+          <h3 class="text-2xl italic text-embersoft font-medium mb-7 pb-3.5 border-b border-white/10">Sweet &amp; Bar</h3>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/honey-custard/120/120" alt="Burnt honey custard" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Burnt Honey Custard</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,400</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Toasted milk skin, sea salt, shortbread.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/chocolate-tart/120/120" alt="Smoked chocolate tart" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Smoked Chocolate Tart</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,550</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Espresso crémeux, candied orange.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/old-fashioned/120/120" alt="Smoked old fashioned cocktail" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Smoked Old Fashioned</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 2,100</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">House bourbon, charred orange, hearth bitters.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 mb-6 items-start">
+            <img src="https://picsum.photos/seed/citrus-spritz/120/120" alt="Citrus and sage spritz" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm flex-shrink-0">
+            <div class="flex-1">
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-display text-lg font-medium">Citrus &amp; Sage Spritz</span>
+                <span class="dotted-line flex-1"></span>
+                <span class="font-mono text-sm text-gold whitespace-nowrap">PKR 1,650</span>
+              </div>
+              <p class="mt-2 text-sm text-bonedim font-light">Non-alcoholic — grapefruit, sage, soda.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-16 font-mono text-xs tracking-wide text-bonedim border-t border-white/10 pt-7">
+        Menu changes weekly with the day's catch and the season's harvest. Please advise your server of any allergies before ordering.
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-24 md:py-36 bg-charcoal2 border-t border-b border-white/10">
+    <div class="max-w-[1180px] mx-auto px-8 grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-24 items-center">
+
+      <div class="order-2 md:order-1">
+        <div class="flex items-center gap-3.5 font-mono text-xs tracking-[0.28em] uppercase text-embersoft mb-4">
+          <span class="w-7 h-px bg-ember inline-block"></span>Our Story
+        </div>
+        <p class="font-display text-xl font-normal leading-relaxed mb-6 max-w-[480px]">One hearth, one fire, never switched off since the day we opened.</p>
+        <p class="text-bonedim font-light mb-6 max-w-[480px]">Ember &amp; Salt began with a simple idea: strip the kitchen down to its oldest tool. No gas lines, no induction — every dish that leaves our pass has touched the same wood fire, tended around the clock by our team of fire-keepers.</p>
+        <p class="text-bonedim font-light mb-6 max-w-[480px]">We work with small fishing crews along the coast and a handful of growers further inland, building the menu around what arrives that morning rather than what a printed menu promises.</p>
+
+        <div class="flex gap-12 md:gap-14 mt-12 flex-wrap">
+          <div><strong class="block font-display text-4xl font-semibold text-embersoft">01</strong><span class="font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim">Hearth, Always Lit</span></div>
+          <div><strong class="block font-display text-4xl font-semibold text-embersoft">14</strong><span class="font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim">Years Running</span></div>
+          <div><strong class="block font-display text-4xl font-semibold text-embersoft">40</strong><span class="font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim">Covers per Service</span></div>
+        </div>
+      </div>
+
+      <div class="order-1 md:order-2 relative aspect-[4/5] md:aspect-[4/5] overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80" alt="Chef tending an open hearth fire in the kitchen" loading="lazy" class="w-full h-full object-cover saturate-90 contrast-105">
+        <div class="absolute inset-0" style="background:linear-gradient(180deg, transparent 55%, rgba(28,24,21,0.65));"></div>
+        <div class="absolute bottom-6 left-6 right-6 z-[2] font-mono text-[11px] tracking-[0.16em] uppercase text-bone">The hearth — Ember &amp; Salt</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="py-24 md:py-36">
+    <div class="max-w-[1180px] mx-auto px-8">
+
+      <div class="flex justify-between items-end flex-wrap gap-6 mb-16">
+        <div>
+          <div class="flex items-center gap-3.5 font-mono text-xs tracking-[0.28em] uppercase text-embersoft mb-4">
+            <span class="w-7 h-px bg-ember inline-block"></span>Gallery
+          </div>
+          <h2 class="font-display font-semibold text-4xl md:text-6xl">A look inside.</h2>
+        </div>
+        <p class="max-w-[360px] text-bonedim font-light">The dining room, the hearth, and the plates that come off it — captured between services.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 auto-rows-[220px] md:auto-rows-[240px]">
+
+        <div class="group relative overflow-hidden sm:col-span-2 sm:row-span-2 md:col-span-2 md:row-span-2">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Dining room with warm lighting" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">The Dining Room</div>
+        </div>
+
+        <div class="group relative overflow-hidden">
+          <img src="https://picsum.photos/seed/ember-fish-plate/600/400" alt="Plated grilled fish dish" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">Grilled Sea Bream</div>
+        </div>
+
+        <div class="group relative overflow-hidden">
+          <img src="https://picsum.photos/seed/ember-garden-plate/600/400" alt="Roasted vegetables on a plate" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">From the Garden</div>
+        </div>
+
+        <div class="group relative overflow-hidden sm:col-span-2 md:col-span-2">
+          <img src="https://images.unsplash.com/photo-1560614382-33500b6c3241?auto=format&fit=crop&w=900&q=80" alt="Flames inside the wood-fired hearth" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">Live Fire</div>
+        </div>
+
+        <div class="group relative overflow-hidden">
+          <img src="https://picsum.photos/seed/ember-kitchen-plate/600/400" alt="Chef plating a dish" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">In the Kitchen</div>
+        </div>
+
+        <div class="group relative overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=600&q=80" alt="Cocktail with charred citrus garnish" loading="lazy" class="w-full h-full object-cover scale-105 saturate-90 transition-transform duration-700 group-hover:scale-110 group-hover:saturate-110">
+          <div class="absolute bottom-0 left-0 right-0 px-4 py-4 font-mono text-[11px] tracking-[0.14em] uppercase opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg, transparent, rgba(28,24,21,0.85));">From the Bar</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- RESERVATIONS -->
+  <section id="reservations" class="py-24 md:py-36 bg-charcoal2 border-t border-b border-white/10">
+    <div class="max-w-[1180px] mx-auto px-8 grid md:grid-cols-[0.9fr_1.1fr] gap-12 md:gap-24">
+
+      <div>
+        <div class="flex items-center gap-3.5 font-mono text-xs tracking-[0.28em] uppercase text-embersoft mb-4">
+          <span class="w-7 h-px bg-ember inline-block"></span>Reservations
+        </div>
+        <h2 class="font-display font-semibold text-4xl md:text-5xl mb-6">Book your table.</h2>
+        <p class="text-bonedim font-light max-w-[380px] mb-8">Tables are held for fifteen minutes past the reservation time. For parties of seven or more, please contact us directly to discuss our set hearth menu.</p>
+
+        <ul class="border-t border-white/10 list-none">
+          <li class="flex justify-between py-3.5 border-b border-white/10 text-sm">
+            <span class="font-display font-medium">Tuesday &ndash; Thursday</span>
+            <span class="font-mono text-bonedim text-[13px]">6:00 PM &ndash; 11:00 PM</span>
+          </li>
+          <li class="flex justify-between py-3.5 border-b border-white/10 text-sm">
+            <span class="font-display font-medium">Friday &ndash; Saturday</span>
+            <span class="font-mono text-bonedim text-[13px]">6:00 PM &ndash; 12:00 AM</span>
+          </li>
+          <li class="flex justify-between py-3.5 border-b border-white/10 text-sm">
+            <span class="font-display font-medium">Sunday</span>
+            <span class="font-mono text-bonedim text-[13px]">1:00 PM &ndash; 9:00 PM</span>
+          </li>
+          <li class="flex justify-between py-3.5 border-b border-white/10 text-sm">
+            <span class="font-display font-medium">Monday</span>
+            <span class="font-mono text-bonedim text-[13px]">Closed</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <form id="resForm" class="grid gap-5">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="resName" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Full Name</label>
+              <input type="text" id="resName" name="resName" placeholder="Your name" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors placeholder:text-bone/30">
+            </div>
+            <div>
+              <label for="resPhone" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Phone</label>
+              <input type="tel" id="resPhone" name="resPhone" placeholder="03XX XXXXXXX" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors placeholder:text-bone/30">
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="resDate" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Date</label>
+              <input type="date" id="resDate" name="resDate" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors">
+            </div>
+            <div>
+              <label for="resTime" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Time</label>
+              <input type="time" id="resTime" name="resTime" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors">
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="resGuests" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Guests</label>
+              <select id="resGuests" name="resGuests" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors">
+                <option value="">Select</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7+</option>
+              </select>
+            </div>
+            <div>
+              <label for="resEmail" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Email</label>
+              <input type="email" id="resEmail" name="resEmail" placeholder="you@email.com" required
+                class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors placeholder:text-bone/30">
+            </div>
+          </div>
+
+          <div>
+            <label for="resNotes" class="block font-mono text-[11px] tracking-[0.18em] uppercase text-bonedim mb-2.5">Special Requests</label>
+            <textarea id="resNotes" name="resNotes" placeholder="Allergies, occasions, seating preferences..." rows="3"
+              class="w-full bg-transparent border-0 border-b border-white/10 text-bone text-base py-2.5 px-0.5 focus:outline-none focus:border-ember transition-colors resize-y placeholder:text-bone/30"></textarea>
+          </div>
+
+          <button type="submit"
+            class="justify-self-start mt-2 bg-ember text-charcoal font-mono text-[13px] tracking-[0.2em] uppercase px-9 py-4.5 hover:bg-embersoft hover:tracking-[0.28em] transition-all cursor-pointer border-none">
+            Request Table
+          </button>
+
+          <div id="confirmMsg" class="hidden border border-olive text-bone px-5.5 py-4.5 text-sm font-mono">
+            Thank you — your request has been received. We'll confirm by email or phone shortly.
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT / FOOTER -->
+  <footer id="contact" class="pt-24 md:pt-32 pb-12">
+    <div class="max-w-[1180px] mx-auto px-8">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1.3fr_1fr_1fr_1fr] gap-10 md:gap-14 pb-16 border-b border-white/10">
+
+        <div class="sm:col-span-2 md:col-span-1">
+          <a href="#top" class="font-display text-2xl font-semibold tracking-wide mb-4 inline-block">Ember <span class="text-embersoft">&amp;</span> Salt</a>
+          <p class="text-bonedim font-light max-w-[280px] text-sm mt-3">A wood-fired coastal kitchen built around one hearth, one fire, and a menu that follows the tide.</p>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-[11px] tracking-[0.22em] uppercase text-embersoft mb-5 font-medium">Visit</h4>
+          <ul class="list-none text-bonedim text-sm space-y-3">
+            <li>14 Shoreline Promenade</li>
+            <li>Clifton, Karachi</li>
+            <li>Sindh, Pakistan</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-[11px] tracking-[0.22em] uppercase text-embersoft mb-5 font-medium">Contact</h4>
+          <ul class="list-none text-bonedim text-sm space-y-3">
+            <li><a href="tel:+922135300000" class="hover:text-bone transition-colors">+92 21 3530 0000</a></li>
+            <li><a href="mailto:hello@emberandsalt.example" class="hover:text-bone transition-colors">hello@emberandsalt.example</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-mono text-[11px] tracking-[0.22em] uppercase text-embersoft mb-5 font-medium">Follow</h4>
+          <div class="flex gap-6 text-bonedim text-sm">
+            <a href="#" aria-label="Instagram" class="hover:text-bone transition-colors">Instagram</a>
+            <a href="#" aria-label="Facebook" class="hover:text-bone transition-colors">Facebook</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex justify-between items-center flex-wrap gap-4 pt-9 font-mono text-[11px] tracking-wide text-bonedim uppercase">
+        <span>&copy; 2026 Ember &amp; Salt. All rights reserved.</span>
+        <span>Designed for the coast.</span>
+      </div>
+
+    </div>
+  </footer>
+
+</main>
+
+</body>
+</html>
